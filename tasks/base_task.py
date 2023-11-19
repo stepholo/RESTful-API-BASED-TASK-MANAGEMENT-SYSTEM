@@ -25,21 +25,17 @@ class TaskManager:
 
         if args:
             raise TypeError('Positional arguments is not accepted(*args)')
-        elif kwargs:
-            for key, value in kwargs.items():
-                if key == 'id':
-                    self.id = value
-                elif key == 'created_at' or 'updated_at':
-                    frmt = '%Y-%m-%dT%H:%M:%S.%f'
-                    setattr(self, key, datetime.strptime(value, frmt))
-                elif key == '__class__':
-                    pass
-                else:
-                    self.__dict__[key] = kwargs[key]
-        else:
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
+        mandatory_args = {'user_name', 'user_email'}
+        missing_args = mandatory_args - set(kwargs.keys())
+
+        if missing_args:
+            raise ValueError(
+                f"Missing mandatory arguments(s): {', '.join(missing_args)}")
+        self.id = kwargs.get('id', str(uuid.uuid4()))
+        self.user_name = kwargs['user_name']
+        self.user_email = kwargs['user_email']
+        self.created_at = kwargs.get('created_at', datetime.now())
+        self.updated_at = kwargs.get('updated_at', datetime.now())
 
     def __str__(self):
         """Returns string representation of an instance in
