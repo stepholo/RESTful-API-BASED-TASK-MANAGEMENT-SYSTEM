@@ -6,6 +6,7 @@
 
 import uuid
 from datetime import datetime
+from tasks import storage
 
 
 class TaskManager:
@@ -44,6 +45,14 @@ class TaskManager:
         obj_name = self.__class__.__name__
         obj_id = self.id
         return f"[{obj_name}] ({obj_id}) {self.__dict__}"
+
+    def save(self):
+        """Method to update the attribute updated_at with
+            the current datetime
+        """
+        self.updated_at = datetime.now()
+        storage.new(self)
+        storage.save()
 
     def to_dict(self):
         """Method to return keys/value of __dict__ of the class instance
