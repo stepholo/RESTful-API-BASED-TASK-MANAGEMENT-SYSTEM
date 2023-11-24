@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 """Package initializer containing
-    unique FileStorage instance for the application
+    unique DBStorage instance for the application
 """
 
 
-from tasks.engine.task_storage import FileStorage
+from tasks.engine.task_storage import DBStorage
 
-storage = FileStorage()
+storage = DBStorage()
 storage.reload()
