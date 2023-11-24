@@ -1,6 +1,12 @@
 # Database Schema
 # Using root account
 
+CREATE DATABASE IF NOT EXISTS tasks_db;
+
+CREATE USER IF NOT EXISTS 'root'@'localhost' IDENTIFIED BY 'qw12ERty';
+GRANT ALL PRIVILEGES ON tasks_db.* TO 'root'@'localhost';
+FLUSH PRIVILEGES;
+
 USE tasks_db;
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
