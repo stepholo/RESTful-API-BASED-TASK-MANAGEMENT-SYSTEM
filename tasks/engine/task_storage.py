@@ -1,67 +1,94 @@
 #!/usr/bin/python3
-"""Module that define class FileStorage"""
+"""Module that define class DBStorage"""
 
 
-import os
-import json
-from datetime import datetime
+from tasks.base_task import Base
+from tasks.create_task import Task
+from tasks.user import User
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 
-class FileStorage:
-    """Class FileStorage that serializes instances to JSON and
-        deserializes JSON file to instances
+storage = 'mysql'
+user = 'root'
+passwd = 'qw12ERty'
+host = 'localhost'
+db = 'tasks_db'
 
-        Private Class attributes:
-            __file_path: String: String - path to the JSON file(file.json)
-            __objects: dictionary - empty but will store all objects by
-                        <class name>.id
-        Public instance methods:
-            all: returns the dictionary __objects
-            new: sets in __objects the obj with key <obj class name>.id
-            save: serializes __objects to the JSON file(path: __file_path)
-            reload: deserializes the JSON file to __objects
-                    only if the JSON file exists: otherwise do nothing.
-                    If the file doesn't exist, no exeception should be raised
-    """
+classes = {'User': User, 'Task': Task}
 
-    __file_path = 'file.json'
-    __objects = {}
 
-    def all(self):
-        """instance method that returns the dictionary __object"""
-        return FileStorage.__objects
+class DBStorage:
+    """interacts with the MySQL database"""
+    __engine = None
+    __session = None
+
+    def __init__(self):
+        """Instantiate a DBStorage object"""
+        self.__engine = create_engine('{}://{}:{}@{}/{}'.format(
+            storage, user, passwd, host, db
+        ))
+        self.reload()
+
+    def all(self, cls=None):
+        """query on the current database session"""
+        if cls:
+            return self.__session.query(cls).all()
+        else:
+            users = self.__session.query(User).all()
+            task = self.__session.query(Task).all()
+            return users, task
 
     def new(self, obj):
-        """Sets in __object the obj with key
-            Parameter:
-                obj: object to set into a dict
-        """
-        key = '{}.{}'.format(obj.__class__.__name__, obj.id)
-        FileStorage.__objects[key] = obj
+        """add the object to the current database session"""
+        self.__session.add(obj)
+        self.save()
 
     def save(self):
-        """Serializes __objects to the JSON file"""
-        with open(FileStorage.__file_path, 'w') as json_file:
-            o = {k: obj.to_dict() for k, obj in FileStorage.__objects.items()}
-            json.dump(o, json_file)
+        """commit all changes of the current database session"""
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e
+
+    def delete(self, obj=None):
+        """delete from the current database session obj if not None"""
+        if obj:
+            self.__session.delete(obj)
+            self.save()
 
     def reload(self):
-        """Deserializes the json file to __objects"""
-        if os.path.exists(FileStorage.__file_path):
-            with open(FileStorage.__file_path, 'r') as json_file:
-                data = json.load(json_file)
-                from tasks.base_task import TaskManager
-                for key, value in data.items():
-                    cls_name, obj_id = key.split('.')
-                    if cls_name == 'TaskManager':
-                        cls = TaskManager
-                    else:
-                        cls = None
-                    if cls:
-                        value['created_at'] = datetime.strptime(
-                            value['created_at'], '%Y-%m-%dT%H:%M:%S.%f')
-                        value['updated_at'] = datetime.strptime(
-                            value['updated_at'], '%Y-%m-%dT%H:%M:%S.%f')
-                        FileStorage.__objects[key] = cls(**value)
-        else:
-            pass
+        """reloads data from the database"""
+        Base.metadata.create_all(self.__engine)
+        Session = sessionmaker(bind=self.__engine)
+        self.__session = Session()
+
+    def get_user_by_id(self, cls, id=None):
+        """Returns the user object based on the class name and its ID, or
+            None if not found
+        """
+        if cls not in classes.values():
+            return None
+        if cls == User and id is not None:
+            value = self.__session.query(cls).filter_by(
+                id=id).first()
+            return value
+        return None
+
+    def get_user_by_email(self, cls, email=None):
+        """Method to get user object by email address"""
+        if cls not in classes.values() or email is None:
+            return None
+        user = self.__session.query(cls).filter_by(email_address=email).first()
+        return user
+
+    def get_task(self, cls, task_id):
+        """Returns all task by task_id"""
+        if cls not in classes.values():
+            return None
+        if cls == Task:
+            value = self.__session.query(cls).filter_by(
+                task_id=task_id).first()
+            return value
+        return None
