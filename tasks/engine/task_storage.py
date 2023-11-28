@@ -44,17 +44,29 @@ class DBStorage:
         self.__session.add(obj)
         self.save()
 
-    def save(self):
+    def save(self, obj=None):
         """commit all changes of the current database session"""
-        try:
-            self.__session.commit()
-        except Exception as e:
-            self.__session.rollback()
-            raise e
+        if obj is not None and isinstance(obj, User):
+            users = self.all(User)
+            if users:
+                for user in users:
+                    if user.email_address == obj.email_address:
+                        raise ValueError('That email address has been taken')
+        else:
+            try:
+                self.__session.commit()
+            except Exception as e:
+                self.__session.rollback()
+                raise e
 
     def delete(self, obj=None):
         """delete from the current database session obj if not None"""
-        if obj:
+        if obj and isinstance(obj, User):
+            self.__session.delete(obj)
+            self.save()
+            self.__session.query(Task).filter(Task.user_id == None).delete()
+            self.save()
+        elif obj and isinstance(obj, Task):
             self.__session.delete(obj)
             self.save()
 
@@ -72,7 +84,7 @@ class DBStorage:
             return None
         if cls == User and id is not None:
             value = self.__session.query(cls).filter_by(
-                id=id).first()
+                id=id).all()
             return value
         return None
 
@@ -81,14 +93,25 @@ class DBStorage:
         if cls not in classes.values() or email is None:
             return None
         user = self.__session.query(cls).filter_by(email_address=email).first()
-        return user
+        if user:
+            return user
+        else:
+            raise ValueError('No user with such email')
 
-    def get_task(self, cls, task_id):
-        """Returns all task by task_id"""
+    def get_task(self, cls, task_id=None, user_id=None, email=None):
+        """Returns all task by task_id or user_id"""
         if cls not in classes.values():
             return None
-        if cls == Task:
+        if cls == Task and task_id is not None:
             value = self.__session.query(cls).filter_by(
                 task_id=task_id).first()
+            return value
+        if cls == Task and user_id is not None:
+            value = self.__session.query(cls).filter_by(
+                user_id=user_id).first()
+            return value
+        if cls == Task and email is not None:
+            value = self.__session.query(cls).filter_by(
+                email_address=email).all()
             return value
         return None
