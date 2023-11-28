@@ -50,7 +50,7 @@ class TaskManager:
         """
         self.updated_at = datetime.utcnow()
         tasks.storage.new(self)
-        tasks.storage.save()
+        tasks.storage.save(self)
 
     def to_dict(self):
         """Method to return keys/value of __dict__ of the class instance
