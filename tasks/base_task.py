@@ -50,7 +50,7 @@ class TaskManager:
         """
         self.updated_at = datetime.utcnow()
         tasks.storage.new(self)
-        tasks.storage.save(self)
+        tasks.storage.save()
 
     def to_dict(self):
         """Method to return keys/value of __dict__ of the class instance
@@ -61,6 +61,8 @@ class TaskManager:
         if 'updated_at' in obj_dict:
             obj_dict['updated_at'] = obj_dict['updated_at'].strftime(time)
         obj_dict["__class__"] = self.__class__.__name__
+        if "_sa_instance_state" in obj_dict:
+            del obj_dict["_sa_instance_state"]
         return obj_dict
 
     def delete(self):
