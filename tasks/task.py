@@ -62,7 +62,9 @@ class Task(TaskManager, Base):
 
         if email_address is None:
             raise ValueError('User email is required to create task')
-        self.user_id = self._auto_update_user_id(email_address)
+        user_id, email_address = self._auto_update_user_id(email_address)
+        self.user_id = user_id
+        self.email_address = email_address
 
     def _validate_priority(self, priority):
         """Validate and set priority level"""
@@ -83,6 +85,6 @@ class Task(TaskManager, Base):
         from tasks import storage
         user = storage.get_user_by_email(User, email=user_email)
         if user:
-            return user.id
+            return user.id, user.email_address
         else:
             raise ValueError(f'No user found with email {user_email}')
