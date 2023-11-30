@@ -59,7 +59,7 @@ def on_email_address_changed(target, value, oldvalue, initiator):
         user's email is changed
     """
     from tasks import storage
-    from tasks.create_task import Task
+    from tasks.tasks import Task
     tasks = storage.all(Task)
     for task in tasks:
         if task.user_id == target.id:

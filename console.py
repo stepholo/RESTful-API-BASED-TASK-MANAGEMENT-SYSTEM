@@ -5,8 +5,8 @@ This is the entry point of the command interpreter
 """
 
 from tasks import storage
-from tasks.user import User
-from tasks.create_task import Task
+from tasks.users import User
+from tasks.tasks import Task
 from datetime import datetime, timedelta
 import cmd
 import os

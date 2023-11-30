@@ -3,8 +3,8 @@
 
 
 from tasks.base_task import Base
-from tasks.create_task import Task
-from tasks.user import User
+from tasks.tasks import Task
+from tasks.users import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 

@@ -3,7 +3,7 @@
 
 
 from tasks.base_task import TaskManager, Base
-from tasks.user import User
+from tasks.users import User
 from datetime import datetime, timedelta
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
