@@ -48,5 +48,5 @@ responses:
            type: datetime
            description: The date and time when the task will be completed
         days_to_complete:
-           type: string
+           type: integer
            description: Number of days it would take to complete the task
