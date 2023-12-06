@@ -1,0 +1,15 @@
+  Deletes a task
+    ---
+    tags:
+      - Tasks
+    parameters:
+      - name: task_id
+        in: path
+        type: string
+        required: false
+        description: The unique id of the task
+    responses:
+      404:
+        description: user not found!
+      200:
+        description: request executed successfully
