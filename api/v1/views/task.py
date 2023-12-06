@@ -129,7 +129,8 @@ def create_task():
     if 'description' not in request.get_json():
         abort(400, description='Missing task description')
     if 'priority_level' not in request.get_json():
-        abort(400, description='Missing task priority level (high, low, medium)')
+        abort(400,
+              description='Missing task priority level (high, low, medium)')
     if 'title' not in request.get_json():
         abort(400, description='Missing task title')
     if 'email_address' not in request.get_json():
