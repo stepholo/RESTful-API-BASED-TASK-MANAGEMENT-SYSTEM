@@ -7,6 +7,7 @@ from tasks.users import User
 from datetime import datetime, timedelta
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
+from uuid import uuid4
 
 
 class Task(TaskManager, Base):
@@ -24,9 +25,9 @@ class Task(TaskManager, Base):
     """
     __tablename__ = 'tasks'
 
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(String(60), ForeignKey('users.id'))
     email_address = Column(String(100), nullable=False)
-    task_id = Column(Integer, primary_key=True)
+    task_id = Column(String(60), primary_key=True)
     title = Column(String(100), nullable=False)
     description = Column(String(255), nullable=False)
     priority_level = Column(String(100), nullable=False)
@@ -59,6 +60,9 @@ class Task(TaskManager, Base):
         if completion_status:
             self.completion_status = self._validate_completion_status(
                 completion_status).lower()
+
+        if kwargs.get("task_id", None) is None:
+            self.task_id = str(uuid4())
 
         if email_address is None:
             raise ValueError('User email is required to create task')
