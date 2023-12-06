@@ -5,7 +5,6 @@ from api.v1.views import app_views
 from flask import Flask, make_response, jsonify
 from flask_cors import CORS
 from flasgger import Swagger
-from flasgger.utils import swag_from
 
 
 app = Flask(__name__)
@@ -29,4 +28,4 @@ Swagger(app)
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, threaded=True, debug=True)
+    app.run(host='0.0.0.0', port=5000, threaded=True)
