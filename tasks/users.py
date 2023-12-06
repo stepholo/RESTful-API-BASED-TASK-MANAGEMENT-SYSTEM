@@ -3,8 +3,9 @@
 
 
 from tasks.base_task import TaskManager, Base
-from sqlalchemy import Column, String, Integer, event
+from sqlalchemy import Column, String, event
 from sqlalchemy.orm import relationship
+from uuid import uuid4
 
 
 class User(TaskManager, Base):
@@ -16,7 +17,7 @@ class User(TaskManager, Base):
     """
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(String(60), primary_key=True)
     first_name = Column(String(100), nullable=False)
     last_name = Column(String(100), nullable=False)
     email_address = Column(String(100), nullable=False)
@@ -46,6 +47,9 @@ class User(TaskManager, Base):
             raise ValueError('What is your email address?')
         else:
             self.email_address = email_address
+
+        if kwargs.get("id", None) is None:
+            self.id = str(uuid4())
 
     def update_email_address(self, new_email):
         """Update the user's email address"""
