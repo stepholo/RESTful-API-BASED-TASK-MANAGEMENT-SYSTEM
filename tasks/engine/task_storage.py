@@ -46,18 +46,11 @@ class DBStorage:
 
     def save(self, obj=None):
         """commit all changes of the current database session"""
-        if obj is not None and isinstance(obj, User):
-            users = self.all(User)
-            if users:
-                for user in users:
-                    if user.email_address == obj.email_address:
-                        raise ValueError('That email address has been taken')
-        else:
-            try:
-                self.__session.commit()
-            except Exception as e:
-                self.__session.rollback()
-                raise e
+        try:
+            self.__session.commit()
+        except Exception as e:
+            self.__session.rollback()
+            raise e
 
     def delete(self, obj=None):
         """delete from the current database session obj if not None"""

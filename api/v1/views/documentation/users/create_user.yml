@@ -1,0 +1,25 @@
+    Creates a new user
+    ---
+    tags:
+      - Users
+    parameters:
+      - name: First name, Last name, Email address
+        in: body
+        required: true
+        requires:
+          - email address:
+          - first name:
+          - last name:
+        properties:
+          email_address:
+            type: string
+          first_name:
+            type: string
+          last_name:
+            type: string
+
+    responses:
+      400:
+        description: Missing email address/first name/last name or not a JSON
+      201:
+        description: successfully created user

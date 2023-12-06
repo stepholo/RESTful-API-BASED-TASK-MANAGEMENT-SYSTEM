@@ -1,0 +1,39 @@
+  Create a new task
+    ---
+    tags:
+      - Tasks
+    parameters:
+      - name:
+          - completion status
+          - days to complete
+          - description
+          - priority level
+          - title
+          - email address
+        in: body
+        required: true
+        requires:
+          - email address:
+          - first name:
+          - last name:
+        properties:
+          email_address:
+            type: string
+          title:
+            type: string
+          priority level:
+            type: string
+          description:
+            type: string
+          days to complete:
+            type: integer
+          completion status:
+            type: string
+
+    responses:
+      400:
+        description: Missing requirements
+      404:
+        description: Not a JSON
+      201:
+        description: successfully created user

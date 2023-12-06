@@ -124,17 +124,8 @@ class TASKCommand(cmd.Cmd):
             print(e)
             return
 
-        tasks = storage.all(Task)
-        ask_id = 0
-        for task in tasks:
-            if task.email_address == email_address:
-                if task.task_id > ask_id:
-                    ask_id = task.task_id
-
-        task = storage.get_task(Task, task_id=ask_id)
-        user = storage.get_user_by_email(User, email=email_address)
-        print("Task; id-{}, title-{} was created by: {} {}".format(
-            task.task_id, task.title, user.first_name, user.last_name))
+        for key, value in task.to_dict().items():
+            print(f'{key} - {value}')
 
     def do_update_user(self, arg):
         """Update an existing user's details a user has to provide the correct

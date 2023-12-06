@@ -7,9 +7,11 @@ from tasks import storage
 from api.v1.views import app_views
 from flask import jsonify, abort, request, make_response
 from datetime import datetime, timedelta
+from flasgger.utils import swag_from
 
 
 @app_views.route('/tasks', methods=['GET'], strict_slashes=False)
+@swag_from('documentation/tasks/list_tasks.yml', methods=['GET'])
 def list_tasks():
     """Retrives the list of all Task objects"""
     tasks = storage.all(Task)
@@ -19,10 +21,12 @@ def list_tasks():
     return jsonify(task_list)
 
 
-@app_views.route('/tasks/by_id/<id>', methods=['GET'], strict_slashes=False)
-def get_task_id(id):
+@app_views.route('/tasks/by_id/<task_id>',
+                 methods=['GET'], strict_slashes=False)
+@swag_from('documentation/tasks/get_task_id.yml', methods=['GET'])
+def get_task_id(task_id):
     """Get tasks by id"""
-    tasks = storage.get_task(Task, task_id=id)
+    tasks = storage.get_task(Task, task_id=task_id)
     if not tasks:
         abort(404)
 
@@ -31,6 +35,7 @@ def get_task_id(id):
 
 @app_views.route('/tasks/<email_address>',
                  methods=['GET'], strict_slashes=False)
+@swag_from('documentation/tasks/get_task_email.yml', methods=['GET'])
 def get_task_email(email_address):
     """Get tasks by user's email address"""
     tasks = storage.get_task(Task, email=email_address)
@@ -42,6 +47,7 @@ def get_task_email(email_address):
 
 @app_views.route('/user/tasks/<email_address>',
                  methods=['GET'], strict_slashes=False)
+@swag_from('documentation/tasks/get_user_task_email.yml', methods=['GET'])
 def get_user_task_email(email_address):
     """Get a user and all tasks related to it"""
     tasks = storage.get_task(Task, email=email_address)
@@ -57,6 +63,7 @@ def get_user_task_email(email_address):
 
 @app_views.route('/tasks/<task_id>',
                  methods=['DELETE'], strict_slashes=False)
+@swag_from('documentation/tasks/delete_task.yml', methods=['DELETE'])
 def delete_task(task_id):
     """Deletes task"""
     tasks = storage.get_task(Task, task_id=task_id)
@@ -69,6 +76,7 @@ def delete_task(task_id):
 
 @app_views.route('/tasks/<task_id>',
                  methods=['PUT'], strict_slashes=False)
+@swag_from('documentation/tasks/update_task.yml', methods=['PUT'])
 def update_task(task_id):
     """Update a task"""
     task = storage.get_task(Task, task_id=task_id)
@@ -89,7 +97,7 @@ def update_task(task_id):
         days_to_complete = data['days_to_complete']
         if days_to_complete:
             days = int(days_to_complete)
-            if days < 1:
+            if days == 0:
                 task.deadline = datetime.now()
             else:
                 task.deadline = datetime.now() + timedelta(days=days)
@@ -101,14 +109,15 @@ def update_task(task_id):
         if key not in ignore:
             setattr(task, key, value)
 
-    storage.save()
+    task.save()
     task = storage.get_task(Task, task_id=task_id)
     return make_response(jsonify(task.to_dict()), 200)
 
 
-@app_views.route('/tasks/<email_address>',
+@app_views.route('/tasks',
                  methods=['POST'], strict_slashes=False)
-def create_task(email_address):
+@swag_from('documentation/tasks/create_task.yml', methods=['POST'])
+def create_task():
     """Create a task based on existing user's email address"""
     if not request.get_json():
         abort(404, description='Not a JSON')
@@ -120,13 +129,16 @@ def create_task(email_address):
     if 'description' not in request.get_json():
         abort(400, description='Missing task description')
     if 'priority_level' not in request.get_json():
-        abort(400, description='Missing task priority level (high, low, medium)')
+        abort(400,
+              description='Missing task priority level (high, low, medium)')
     if 'title' not in request.get_json():
         abort(400, description='Missing task title')
+    if 'email_address' not in request.get_json():
+        abort(400, description="Missing user's email address")
 
     data = request.get_json()
-    data['email_address'] = email_address
     task = Task(**data)
+    task.email_address = data['email_address']
     task.title = data['title']
     task.description = data['description']
     task.days_to_complete = data['days_to_complete']
