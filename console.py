@@ -65,7 +65,7 @@ class TASKCommand(cmd.Cmd):
             print(e)
             return
         user = storage.get_user_by_email(User, email_address)
-        print(f"{user.first_name} {user.last_name}'s id is {user.id}")
+        print(f"{user.first_name} {user.last_name} has been created")
 
     def do_create_task(self, arg):
         """Create a single task for an existing user: Please provide
