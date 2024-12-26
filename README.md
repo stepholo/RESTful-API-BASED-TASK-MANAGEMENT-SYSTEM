@@ -3,7 +3,7 @@
 ## Introduction
 This project is a web service that allows users to manage their tasks using a task management API where users can create, update, delete tasks and set deadlines.
 The project utilized Swagger for documentation and also laverages on the Swagger user interface to make it easier for the consumer.
-- [Deployed site](http://16.171.57.238:5000/apidocs/#/)
+- [Deployed site](http://44.210.122.106:8000/apidocs/#/)
 - Project Blog Article [Blog](https://www.linkedin.com/pulse/revolutionizing-task-management-unveiling-our-innovative-stephen-oloo-dzokf%3FtrackingId=pcUEpgaPSZaPMm7U4FRoGw%253D%253D/?trackingId=pcUEpgaPSZaPMm7U4FRoGw%3D%3D)
 - Linkedin Profile [Stephen](www.linkedin.com/in/stepholo0)
 
